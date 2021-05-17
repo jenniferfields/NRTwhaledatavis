@@ -1,15 +1,16 @@
+#Script for NOAA data for whale entanglements and strandings
+#Code written by Alex Thomsen; modified by Jennifer Fields
 rm(list=ls()); w=3; h=3; w2=4.5; w3=7.5; h2=4.5
 
-# defining working directories for data & graphs
-wd <- "/Volumes/AThomsen Dr/WhaleMort/Technical/NOAA/Data/CSVs"
-wd_graphs <- "/Volumes/AThomsen Dr/WhaleMort/Technical/NOAA/Graphs" 
-
-setwd(wd)
-
-library(ggplot2)
-library(dplyr)
-library(tidyr)
+#load libraries
+library(tidyverse)
+library(lubridate)
 library(RColorBrewer)
+library(patchwork)
+
+#load data
+en<-read.csv("data/Entangled_WA-OR-CA_1982-2019_corrected.csv")
+
 
 # function to help rename species in a consistent way across data frames
 capFirst <- function(s) {
@@ -17,15 +18,14 @@ capFirst <- function(s) {
 }
 
 # making color scale for species (so each species always gets graphed using a consistent color)
-mycolors = brewer.pal(9,"Spectral")
+mycolors = brewer.pal(9,"Paired")
 names(mycolors) = c("Blue","Fin","Gray","Humpback","Minke","Orca","Sei","Sperm","Unknown")
-colScale <- scale_fill_manual(name = "Common.Name",values = mycolors)
+colScale <- scale_fill_manual(name = "Common Name",values = mycolors)
 
 
 ###### ENTANGLEMENTS ANALYSIS ######
 
-en = read.csv("Entangled_WA-OR-CA_1982-2019_corrected.csv",stringsAsFactors = F)
-en$Response.Date = as.Date(en$Response.Date,format="%m/%d/%y") # format date
+en$Response.Date <- mdy(en$Response.Date,quiet=FALSE, tz="America/Los_Angeles", truncated=0) # format date
 
 ###### examining data
 colnames(en)
@@ -95,26 +95,32 @@ nrow(en2010[en2010$Common.Name=="Minke",]) # 3 minke in post-2010 dataset
 nrow(en2010[en2010$Common.Name=="Orca",]) # 2 orcas in post-2010 dataset
 
 
-###### graphs
-setwd(wd_graphs)
+###### graphs#####
+
 
 # bar graph w/ entanglements by year (color by species)
-en.sp.year =
+en.sp.year <-
   en %>%
   group_by(Common.Name,Year) %>%
   tally()
+df$days<-as.Date(format(df$date,"%d-%m-2015"),format="%d-%m-%y")
 
-quartz(height=h,width=w3)
-ggplot(en.sp.year, aes(x = Year, y = n, fill=Common.Name)) + 
+
+entbyspp<-ggplot(en.sp.year, aes(x = Year, y = n, fill=Common.Name)) + 
   geom_col() +
   colScale +
-  xlab("Year") +
-  ylab("Total entanglements") +
   theme_classic() +
-  theme(legend.title=element_blank(), axis.text.x=element_text(angle=90, vjust=0.5))
-dev.copy(dev=png,file="Entangl_year_species_allyrs.png",wid=w3,hei=h,
-         uni="in",res=450)
-dev.off()
+  theme(legend.position="none")+ 
+  theme(axis.title.x=element_text(color="black", size=40), 
+        axis.title.y=element_text(color="black", size=40),
+        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
+        axis.text.y =element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=30),
+        legend.title = element_blank()) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x='Year', y='Total entanglements')
+entbyspp
+
 
 # bar graph w/ entanglements by year (color by vital status)
 en.vs.year =
@@ -136,37 +142,45 @@ en.sp.mo =
   en2010 %>%
   group_by(Common.Name,Month) %>%
   tally()
-
-quartz(height=h,width=w2)
-ggplot(en.sp.mo, aes(x = Month, y = n, fill=Common.Name)) + 
+#fix
+Monthwhaleent<-ggplot(en.sp.mo, aes(x = Month, y = n, fill=Common.Name)) + 
   geom_col() +
   colScale +
-  xlab("Month") +
-  ylab("Entangl. 2010-present") +
   theme_classic() +
-  theme(legend.title=element_blank(), axis.text.x=element_text(angle=45, vjust=0.5))
-dev.copy(dev=png,file="Entangl_month_species_post2010.png",wid=w2,hei=h,
-         uni="in",res=450)
-dev.off()
+  #theme(legend.position="none")+ 
+  theme(axis.title.x=element_text(color="black",size=40), 
+        axis.title.y=element_blank(),
+        axis.text.x =element_text(color="black", size=30, vjust=0.5),
+        axis.text.y =element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=50),
+        legend.title = element_blank()) +
+  scale_x_discrete(labels= c('01'='Jan', '02'='Feb',
+                            '03'='Mar','04'='Apr','05'='May','06'='Jun','07'='Jul','08'='Aug',
+                            '09'='Sept','10'='Oct','11'='Nov','12'='Dec'))+
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x='Time of year', y='Total entanglements')
+Monthwhaleent
 
 # bar graph w/ entanglements by county (color by species)
 en.sp.county =
   en2010 %>%
-  group_by(Common.Name,Sort) %>%
+  group_by(Common.Name,County) %>%
   tally()
-
-quartz(height=h,width=w3)
-ggplot(en.sp.county, aes(x = Sort, y = n, fill=Common.Name)) + 
+#need to make north to south
+entbycounty<-ggplot(en.sp.county, aes(x = County, y = n, fill=Common.Name)) + 
   geom_col() +
   colScale +
-  xlab("County/Country") +
-  ylab("Entangl. 2010-present") +
-  scale_x_discrete(limits=counties2010$County) +
-  theme_classic() +
-  theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
-dev.copy(dev=png,file="Entangl_county_species_post2010.png",wid=w3,hei=h,
-         uni="in",res=450)
-dev.off()
+  theme_classic()+
+  theme(legend.position="none")+ 
+  theme(axis.title.x=element_text(color="black", size=40), 
+        axis.title.y=element_text(color="black", size=40),
+        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
+        axis.text.y =element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=50),
+        legend.title = element_blank()) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x='County/Country', y='Total entanglements')
+entbycounty
 
 # bar graph w/ entanglements by gear type (color by species)
 en.sp.gear = 
@@ -174,26 +188,35 @@ en.sp.gear =
   group_by(Common.Name,Entanglement.Fishery.Type) %>%
   tally()
 
-quartz(height=h,width=w2)
-ggplot(en.sp.gear, aes(x=Entanglement.Fishery.Type, y=n, fill=Common.Name)) + 
+#need to fix x axis labels
+fishtype<-ggplot(en.sp.gear, aes(x=Entanglement.Fishery.Type, y=n, fill=Common.Name)) + 
   geom_col() +
   colScale +
-  xlab("Gear type") +
-  ylab("Entangl. 2010-present") +
-  theme_classic() +
-  theme(legend.title = element_blank(), axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
-dev.copy(dev=png,file="Entangl_gear_species_post2010.png",wid=w2,hei=h,
-         uni="in",res=450)
-dev.off()
+  theme_classic()+
+  theme(legend.position="none")+ 
+  theme(axis.title.x=element_text(color="black", size=40), 
+        axis.title.y=element_text(color="black", size=40),
+        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
+        axis.text.y =element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=30),
+        legend.title = element_blank()) +
+  scale_x_discrete(labels= c('ComDungCrab'='Com. Dung. Crab', 'ComLobster'='Com. Lobster',
+                             'ComSpotPrawn'='Com. Spot Prawn','DriftGillnet'='Drift Gillnet','Gillnet'='Gillnet', 'Net'='Net','Other'='Other',
+                             'RecDungCrab'='Rec. Dung. Crab','RecSpotPrawn'='Rec. Spot Prawn','TribalDungCrab'='Tribal Dung. Crab','TribalGillnet'='Tribal Gillnet','Unknown'='Unknown'))+
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x='Type of fishery gear', y='Total entanglements')
+fishtype
 
+entanglement<-(entbyspp/(fishtype+Monthwhaleent)/entbycounty)+
+  plot_annotation(tag_levels = 'A') &         #label each individual plot with letters A-G
+  theme(plot.tag = element_text(size =50,face='bold'))   #edit the lettered text
+entanglement
+ggsave(filename = "Output/entanglement.pdf", useDingbats =FALSE,dpi=600,device = "pdf", width = 30, height = 40)
 
 ###### STRANDINGS ######
-setwd(wd)
-
-st_WAOR = read.csv("Strands_WA-OR_1974-2019.csv",stringsAsFactors = F)
-st_CA_pre2006 = read.csv("Strands_CA_1982-2005.csv",stringsAsFactors = F)
-st_CA_post2006 = read.csv("Strands_CA_2006-2019.csv",stringsAsFactors = F)
-
+st_WAOR<-read.csv("data/Strands_WA-OR_1974-2019.csv")
+st_CA_post2006<-read.csv("data/Strands_CA_2006-2019.csv")
+st_CA_pre2006<-read.csv("data/Strands_CA_1982-2005.csv")
 # checking colnames between WA-OR and CA post-2006 are the same
 cols_all = colnames(st_WAOR)
 colnames(st_CA_post2006)%in%cols_all # all "TRUE"
@@ -318,29 +341,30 @@ counties2010.st = data.frame(County = as.character(
 st2010 = merge(st2010, counties2010.st)
 
 
-###### graphs
-setwd(wd_graphs)
+#### Stranding graphs ####
 
 int.labs = c("Ship strike","Shot","Fishery","Other")
 names(int.labs) = c("Boat.Collision","Shot","Fishery.Interaction","Other.Human.Interaction")
-
+#####All stranding graphs#####
 # strandings by year (color by species)
 st.sp.year =
   st %>%
   group_by(Common.Name,Year) %>%
   tally()
 
-quartz(height=h,width=w2)
-ggplot(st.sp.year, aes(x = Year, y = n, fill=Common.Name)) + 
+StrandingbyYear<-ggplot(st.sp.year, aes(x = Year, y = n, fill=Common.Name)) + 
   geom_col() +
   colScale +
-  xlab("Year") +
-  ylab("Total strandings") +
   theme_classic() +
-  theme(legend.title=element_blank(), axis.text.x=element_text(angle=90, vjust=0.5))
-dev.copy(dev=png,file="Strand_year_species_allyrs.png",wid=w2,hei=h,
-         uni="in",res=450)
-dev.off()
+  theme(axis.title.x=element_text(color="black", size=40), 
+        axis.title.y=element_text(color="black", size=40),
+        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
+        axis.text.y =element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=30),
+        legend.title = element_blank()) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x='Year', y='Total Strandings')
+StrandingbyYear
 
 # strandings by year (color by alive/dead)
 st.vs.year =
@@ -348,14 +372,19 @@ st.vs.year =
   group_by(Vital.Status,Year) %>%
   tally()
 
-quartz(height=h,width=w2)
-ggplot(st.vs.year, aes(x = Year, y = n, fill=Vital.Status)) + 
+DorAallStrandings<-ggplot(st.vs.year, aes(x = Year, y = n, fill=Vital.Status)) + 
   geom_col() +
-  scale_fill_brewer(palette="Spectral") +
-  xlab("Year") +
-  ylab("Total strandings") +
+  scale_fill_brewer(palette="Set2") +
   theme_classic() +
-  theme(legend.title=element_blank(), axis.text.x=element_text(angle=90, vjust=0.5))
+  theme(axis.title.x=element_text(color="black", size=40), 
+        axis.title.y=element_text(color="black", size=40),
+        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
+        axis.text.y =element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=30),
+        legend.title = element_blank()) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x='Year', y='Total Strandings')
+DorAallStrandings
 
 # entangled strandings by year (color by alive/dead) ***NEW***
 st.vs.year.ent =
@@ -363,7 +392,7 @@ st.vs.year.ent =
   group_by(Vital.Status,Year) %>%
   tally()
 
-quartz(height=h,width=w2)
+
 ggplot(st.vs.year.ent, aes(x = Year, y = n, fill=Vital.Status)) + 
   geom_col() +
   scale_fill_brewer(palette="Set3") +
@@ -372,29 +401,69 @@ ggplot(st.vs.year.ent, aes(x = Year, y = n, fill=Vital.Status)) +
   ylim(0,18) +
   theme_classic() +
   theme(legend.title=element_blank(), axis.text.x=element_text(angle=90, vjust=0.5))
-dev.copy(dev=png,file="Strand_year_FisheryInt_post2010.png",wid=w2,hei=h,
-         uni="in",res=450)
-dev.off()
 
+##### Ship Strike stranding graphs####
 # ship strike strandings by year (color by alive/dead) ***NEW***
 st.vs.year.ship =
-  st[st$Boat.Collision=="Y",] %>%
+  st2010[st2010$Boat.Collision=="Y",] %>%
   group_by(Vital.Status,Year) %>%
   tally()
 
-quartz(height=h,width=w2)
-ggplot(st.vs.year.ship, aes(x = Year, y = n, fill=Vital.Status)) + 
-  geom_col() +
-  scale_fill_brewer(palette="Set3") +
-  xlab("Year") +
-  ylab("Strandings - Ship Strike") +
-  ylim(0,18) +
-  theme_classic() +
-  theme(legend.title=element_blank(), axis.text.x=element_text(angle=90, vjust=0.5))
-dev.copy(dev=png,file="Strand_year_ShipStrike_post2010.png",wid=w2,hei=h,
-         uni="in",res=450)
-dev.off()
 
+ShipDorA<-ggplot(st.vs.year.ship, aes(x = Year, y = n, fill=Vital.Status)) + 
+  geom_col() +
+  scale_fill_brewer(palette="Set2") +
+  theme_classic() +
+  theme(axis.title.x=element_text(color="black", size=40), 
+        axis.title.y=element_text(color="black", size=40),
+        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
+        axis.text.y =element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=30),
+        legend.title = element_blank()) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x='Year', y='Total ship strike strandings')
+ShipDorA
+
+shipyearspp =
+  st2010[st2010$Boat.Collision=="Y",] %>%
+  group_by(Common.Name,Year) %>%
+  tally()
+
+Shipbyspp<-ggplot(shipyearspp, aes(x = Year, y = n, fill=Common.Name)) + 
+  geom_col() +
+  colScale +
+  theme_classic() +
+  theme(axis.title.x=element_text(color="black", size=40), 
+        axis.title.y=element_text(color="black", size=40),
+        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
+        axis.text.y =element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=30),
+        legend.title = element_blank()) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x='Year', y='Total Strandings')
+Shipbyspp 
+
+# strandings by county (color by species) 
+st.sp.county =
+  st2010[st2010$Boat.Collision=="Y",] %>%
+  group_by(Common.Name,County) %>%
+  tally()
+
+ggplot(st.sp.county, aes(x = County, y = n, fill=Common.Name)) + 
+  geom_col() +
+  colScale +
+  theme_classic() +
+  theme(axis.title.x=element_text(color="black", size=40), 
+        axis.title.y=element_text(color="black", size=40),
+        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
+        axis.text.y =element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=30),
+        legend.title = element_blank()) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x='County', y='Ship strike strandings')
+
+
+####Other spp specific graphs####
 # gray whale strandings by year (color by alive/dead)
 st.vs.year.gr =
   st[st$Common.Name=="Gray",] %>%
@@ -424,25 +493,6 @@ ggplot(st.vs.year.hu, aes(x = Year, y = n, fill=Vital.Status)) +
   ylab("Humpback whale strandings") +
   theme_classic() +
   theme(legend.title=element_blank(), axis.text.x=element_text(angle=90, vjust=0.5))
-
-# strandings by county (color by species) 
-st.sp.county =
-  st2010 %>%
-  group_by(Common.Name,Sort) %>%
-  tally()
-
-quartz(height=h,width=w3)
-ggplot(st.sp.county, aes(x = Sort, y = n, fill=Common.Name)) + 
-  geom_col() +
-  colScale +
-  xlab("County") +
-  ylab("Strandings 2010-present") +
-  scale_x_discrete(limits=counties2010.st$County) +
-  theme_classic() +
-  theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
-dev.copy(dev=png,file="Strand_county_species_post2010.png",wid=w3,hei=h,
-         uni="in",res=450)
-dev.off()
 
 # gray whale strandings by county (color by alive/dead)
 st.sp.county.gr =
