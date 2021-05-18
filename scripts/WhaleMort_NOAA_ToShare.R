@@ -95,7 +95,7 @@ nrow(en2010[en2010$Common.Name=="Minke",]) # 3 minke in post-2010 dataset
 nrow(en2010[en2010$Common.Name=="Orca",]) # 2 orcas in post-2010 dataset
 
 
-###### graphs#####
+###### Entanglement graphs#####
 
 
 # bar graph w/ entanglements by year (color by species)
@@ -128,7 +128,7 @@ en.vs.year =
   group_by(Vital.Status,Year) %>%
   tally()
 
-quartz(height=h,width=w3)
+
 ggplot(en.vs.year, aes(x = Year, y = n, fill=Vital.Status)) + 
   geom_col() +
   scale_fill_brewer(palette="Set3") +
@@ -150,15 +150,16 @@ Monthwhaleent<-ggplot(en.sp.mo, aes(x = Month, y = n, fill=Common.Name)) +
   #theme(legend.position="none")+ 
   theme(axis.title.x=element_text(color="black",size=40), 
         axis.title.y=element_blank(),
-        axis.text.x =element_text(color="black", size=30, vjust=0.5),
+        axis.text.x =element_text(color="black", size=30),
         axis.text.y =element_text(color="black", size=30),
         legend.text = element_text(color="black", size=50),
         legend.title = element_blank()) +
+  guides(fill= guide_legend(override.aes = list(size = 15)))+
   scale_x_discrete(labels= c('01'='Jan', '02'='Feb',
                             '03'='Mar','04'='Apr','05'='May','06'='Jun','07'='Jul','08'='Aug',
                             '09'='Sept','10'='Oct','11'='Nov','12'='Dec'))+
   scale_y_continuous(expand = c(0,0)) +
-  labs(x='Time of year', y='Total entanglements')
+  labs(x='Time of year', y='Total entanglements (2010-present)')
 Monthwhaleent
 
 # bar graph w/ entanglements by county (color by species)
@@ -167,6 +168,14 @@ en.sp.county =
   group_by(Common.Name,County) %>%
   tally()
 #need to make north to south
+en.sp.county$County <- factor(en.sp.county$County, levels=c("CAN","Clallam", "Snohomish", "San Juan", "Jefferson", "Grays Harbor",
+                                                             "Pacific","Clatsop","Tillamook","Lincoln",
+                                                            "Douglas","Coos", "Curry", "Del Norte","Humboldt",
+                                                            "Mendicino","Marin", "Sonoma",
+                                                            "San Francisco", "San Mateo", 
+                                                            "Santa Cruz", "Monterey","San Luis Obispo","Santa Barbara", 
+                                                            "Ventura", "Los Angeles", "Orange", "San Diego","MEX"))
+
 entbycounty<-ggplot(en.sp.county, aes(x = County, y = n, fill=Common.Name)) + 
   geom_col() +
   colScale +
@@ -179,7 +188,7 @@ entbycounty<-ggplot(en.sp.county, aes(x = County, y = n, fill=Common.Name)) +
         legend.text = element_text(color="black", size=50),
         legend.title = element_blank()) +
   scale_y_continuous(expand = c(0,0)) +
-  labs(x='County/Country', y='Total entanglements')
+  labs(x='Country/County', y='Total entanglements (2010-present)')
 entbycounty
 
 # bar graph w/ entanglements by gear type (color by species)
@@ -204,7 +213,7 @@ fishtype<-ggplot(en.sp.gear, aes(x=Entanglement.Fishery.Type, y=n, fill=Common.N
                              'ComSpotPrawn'='Com. Spot Prawn','DriftGillnet'='Drift Gillnet','Gillnet'='Gillnet', 'Net'='Net','Other'='Other',
                              'RecDungCrab'='Rec. Dung. Crab','RecSpotPrawn'='Rec. Spot Prawn','TribalDungCrab'='Tribal Dung. Crab','TribalGillnet'='Tribal Gillnet','Unknown'='Unknown'))+
   scale_y_continuous(expand = c(0,0)) +
-  labs(x='Type of fishery gear', y='Total entanglements')
+  labs(x='Type of fishery gear', y='Total entanglements (2010-present)')
 fishtype
 
 entanglement<-(entbyspp/(fishtype+Monthwhaleent)/entbycounty)+
@@ -348,7 +357,7 @@ names(int.labs) = c("Boat.Collision","Shot","Fishery.Interaction","Other.Human.I
 #####All stranding graphs#####
 # strandings by year (color by species)
 st.sp.year =
-  st %>%
+  st2010 %>%
   group_by(Common.Name,Year) %>%
   tally()
 
@@ -356,6 +365,7 @@ StrandingbyYear<-ggplot(st.sp.year, aes(x = Year, y = n, fill=Common.Name)) +
   geom_col() +
   colScale +
   theme_classic() +
+  theme(legend.position="none")+ 
   theme(axis.title.x=element_text(color="black", size=40), 
         axis.title.y=element_text(color="black", size=40),
         axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
@@ -363,10 +373,10 @@ StrandingbyYear<-ggplot(st.sp.year, aes(x = Year, y = n, fill=Common.Name)) +
         legend.text = element_text(color="black", size=30),
         legend.title = element_blank()) +
   scale_y_continuous(expand = c(0,0)) +
-  labs(x='Year', y='Total Strandings')
+  labs(x='Year', y='Total strandings')
 StrandingbyYear
 
-# strandings by year (color by alive/dead)
+# strandings by year (color by alive/dead)<- Do not use see notes
 st.vs.year =
   st %>%
   group_by(Vital.Status,Year) %>%
@@ -380,7 +390,7 @@ DorAallStrandings<-ggplot(st.vs.year, aes(x = Year, y = n, fill=Vital.Status)) +
         axis.title.y=element_text(color="black", size=40),
         axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
         axis.text.y =element_text(color="black", size=30),
-        legend.text = element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=50),
         legend.title = element_blank()) +
   scale_y_continuous(expand = c(0,0)) +
   labs(x='Year', y='Total Strandings')
@@ -403,7 +413,7 @@ ggplot(st.vs.year.ent, aes(x = Year, y = n, fill=Vital.Status)) +
   theme(legend.title=element_blank(), axis.text.x=element_text(angle=90, vjust=0.5))
 
 ##### Ship Strike stranding graphs####
-# ship strike strandings by year (color by alive/dead) ***NEW***
+# ship strike strandings by year (color by alive/dead) ***NEW***<-don't use
 st.vs.year.ship =
   st2010[st2010$Boat.Collision=="Y",] %>%
   group_by(Vital.Status,Year) %>%
@@ -412,16 +422,18 @@ st.vs.year.ship =
 
 ShipDorA<-ggplot(st.vs.year.ship, aes(x = Year, y = n, fill=Vital.Status)) + 
   geom_col() +
-  scale_fill_brewer(palette="Set2") +
+  scale_fill_brewer(palette="BuPu",direction = -1) +
   theme_classic() +
+  theme(legend.position="top")+ 
   theme(axis.title.x=element_text(color="black", size=40), 
         axis.title.y=element_text(color="black", size=40),
-        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
+        axis.text.x =element_text(color="black", size=30),
         axis.text.y =element_text(color="black", size=30),
-        legend.text = element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=50),
         legend.title = element_blank()) +
+  guides(fill= guide_legend(override.aes = list(size = 15)))+
   scale_y_continuous(expand = c(0,0)) +
-  labs(x='Year', y='Total ship strike strandings')
+  labs(x='Year', y='Ship strike strandings (2010 to present)')
 ShipDorA
 
 shipyearspp =
@@ -433,14 +445,15 @@ Shipbyspp<-ggplot(shipyearspp, aes(x = Year, y = n, fill=Common.Name)) +
   geom_col() +
   colScale +
   theme_classic() +
+  theme(legend.position="none")+ 
   theme(axis.title.x=element_text(color="black", size=40), 
         axis.title.y=element_text(color="black", size=40),
-        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
+        axis.text.x =element_text(color="black", size=30,vjust=0.5),
         axis.text.y =element_text(color="black", size=30),
         legend.text = element_text(color="black", size=30),
         legend.title = element_blank()) +
   scale_y_continuous(expand = c(0,0)) +
-  labs(x='Year', y='Total Strandings')
+  labs(x='Year', y='Ship strike strandings')
 Shipbyspp 
 
 # strandings by county (color by species) 
@@ -449,19 +462,58 @@ st.sp.county =
   group_by(Common.Name,County) %>%
   tally()
 
-ggplot(st.sp.county, aes(x = County, y = n, fill=Common.Name)) + 
+st.sp.county$County <- factor(st.sp.county$County, levels=c("Clallam", "Jefferson", "King", "Pierce","Grays Harbor", "Pacific","Clatsop", "Curry", "Marin",
+"Contra Costa","Alameda", "San Francisco", "San Mateo", 
+"Santa Cruz", "Monterey","Santa Barbara", "Ventura", "Los Angeles", "Orange", "San Diego"))
+
+countyst<-ggplot(st.sp.county, aes(x = County, y = n, fill=Common.Name)) + 
   geom_col() +
   colScale +
   theme_classic() +
+  theme(legend.position="none")+ 
   theme(axis.title.x=element_text(color="black", size=40), 
         axis.title.y=element_text(color="black", size=40),
         axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
         axis.text.y =element_text(color="black", size=30),
-        legend.text = element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=50),
         legend.title = element_blank()) +
   scale_y_continuous(expand = c(0,0)) +
-  labs(x='County', y='Ship strike strandings')
+  labs(x='County', y='Ship strike strandings (2010-present)')
+countyst
 
+# bar graph w/ strandings by month (color by species)
+st2010$Month=format(as.Date(st2010$Observation.Date,format="%Y-%m-%d"),"%m")
+
+st.sp.mo =
+  st2010[st2010$Boat.Collision=="Y",] %>%
+  group_by(Common.Name,Month) %>%
+  tally()
+#fix
+Monthwhalest<-ggplot(st.sp.mo, aes(x = Month, y = n, fill=Common.Name)) + 
+  geom_col() +
+  colScale +
+  theme_classic() +
+  #theme(legend.position="none")+ 
+  theme(axis.title.x=element_text(color="black",size=40), 
+        axis.title.y=element_blank(),
+        axis.text.x =element_text(color="black", size=30),
+        axis.text.y =element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=50),
+        legend.title = element_blank()) +
+  guides(fill= guide_legend(override.aes = list(size = 15)))+
+  scale_x_discrete(labels= c('01'='Jan', '02'='Feb',
+                             '03'='Mar','04'='Apr','05'='May','06'='Jun','07'='Jul','08'='Aug',
+                             '09'='Sept','10'='Oct','11'='Nov','12'='Dec'))+
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x='Time of year', y='Ship strike strandings')
+Monthwhalest
+
+
+strandings<-(Shipbyspp/(ShipDorA+Monthwhalest)/countyst)+
+  plot_annotation(tag_levels = 'A') &         #label each individual plot with letters A-G
+  theme(plot.tag = element_text(size =50,face='bold'))   #edit the lettered text
+strandings
+ggsave(filename = "Output/shipstrikes.pdf", useDingbats =FALSE,dpi=600,device = "pdf", width = 30, height = 40)
 
 ####Other spp specific graphs####
 # gray whale strandings by year (color by alive/dead)
