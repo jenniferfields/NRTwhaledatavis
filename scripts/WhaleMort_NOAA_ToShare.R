@@ -252,7 +252,7 @@ colnames(st_CA_post2006)[1] <- "National.Database.Number" # fixing weird error
 cols_ofinterest = c("National.Database.Number","Common.Name","State","County",
                     "Findings.of.Human.Interaction","Boat.Collision","Shot","Fishery.Interaction",
                     "Fishery.Type","Other.Human.Interaction","Other.Human.Int.Description",
-                    "Other.Human.Int.Type","Condition.at.Examination","Necropsied","Observation.Date")
+                    "Other.Human.Int.Type","Observation.Status","Necropsied","Observation.Date")
 
 # checking WA-OR dataset
 # notes: Fishery.Type & Other.Human.Int.Type not useful (all NA)
@@ -269,7 +269,7 @@ unique(st_WAOR$Fishery.Type) # NA
 unique(st_WAOR$Other.Human.Interaction) # N, Y, ""
 unique(st_WAOR$Other.Human.Int.Description)
 unique(st_WAOR$Other.Human.Int.Type) # NA
-unique(st_WAOR$Condition.at.Examination) # 4 dead categories, plus Condition Unknown & Alive
+unique(st_WAOR$Observation.Status) # 4 dead categories, plus Condition Unknown & Alive "Condition Unknown""Alive""Fresh Dead""Moderate Decomposition" "Advanced Decomposition" "Mummified/Skeletal"   
 unique(st_WAOR$Necropsied) # N, Y, NA, ""
 
 # fixing WA-OR dataset
@@ -291,7 +291,7 @@ unique(st_CA_post2006$Fishery.Type) # 6 categories incl. "" and Unknown Fishery
 unique(st_CA_post2006$Other.Human.Interaction) # N, Y, ""
 unique(st_CA_post2006$Other.Human.Int.Description)
 unique(st_CA_post2006$Other.Human.Int.Type) # Gaffing/Spearing/Harpooning (n=1), Marine Debris Entanglement (n=2), ""
-unique(st_CA_post2006$Condition.at.Examination) # 4 dead categories, plus Condition Unknown, Alive, ""
+unique(st_CA_post2006$Observation.Status) # 4 dead categories, plus Condition Unknown, Alive, ""
 unique(st_CA_post2006$Necropsied) # N, Y, NA
 
 # fixing CA post-2006 dataset
@@ -306,17 +306,17 @@ st = st[st$Common.Name!="Bryde's",] # trimming to species we want
 st$Year = format(as.Date(st$Observation.Date,format="%Y-%m-%d"),"%Y")
 st$Common.Name = gsub("UNSPECIFIED BALEEN WHALE|UNKNOWN MYSTICETE|unidentified baleen|unidentified mysticete|UNIDENTIFIED WHALE",
                       "unknown",st$Common.Name) # combining unknowns
-st$Condition.at.Examination = gsub("Decomposition","Decomp.",st$Condition.at.Examination)
+st$Observation.Status = gsub("Decomposition","Decomp.",st$Observation.Status)
 st$Common.Name = capFirst(st$Common.Name)
 st$Common.Name = gsub("Killer","Orca",st$Common.Name)
 
 # deciding how to narrow to dead only
 # were any necropsied individuals not dead at examination?
-st[st$Condition.at.Examination=="Alive"&st$Necropsied=="Y",] # 1 individual, 17 NAs??
-nrow(st[st$Condition.at.Examination%in%c("Advanced Decomp.","Fresh Dead","Moderate Decomp.",
-                                         "Mummified/Skeletal"),]) # 503 dead at examination
+st[st$Observation.Status=="Alive"&st$Necropsied=="Y",] # 1 individual, 17 NAs??
+nrow(st[st$Observation.Status%in%c("Advanced Decomp.","Fresh Dead","Moderate Decomp.",
+                                         "Mummified/Skeletal"),]) # 537 dead at examination
 nrow(st[st$Necropsied=="Y",]) # 288 necropsied
-st$Vital.Status = st$Condition.at.Examination
+st$Vital.Status = st$Observation.Status
 st$Vital.Status[st$Vital.Status%in%c("Advanced Decomp.","Fresh Dead","Moderate Decomp.",
                                      "Mummified/Skeletal")] <- "Dead"
 st$Vital.Status = gsub("Condition Unknown","Unknown",st$Vital.Status)
@@ -354,63 +354,6 @@ st2010 = merge(st2010, counties2010.st)
 
 int.labs = c("Ship strike","Shot","Fishery","Other")
 names(int.labs) = c("Boat.Collision","Shot","Fishery.Interaction","Other.Human.Interaction")
-#####All stranding graphs#####
-# strandings by year (color by species)
-st.sp.year =
-  st2010 %>%
-  group_by(Common.Name,Year) %>%
-  tally()
-
-StrandingbyYear<-ggplot(st.sp.year, aes(x = Year, y = n, fill=Common.Name)) + 
-  geom_col() +
-  colScale +
-  theme_classic() +
-  theme(legend.position="none")+ 
-  theme(axis.title.x=element_text(color="black", size=40), 
-        axis.title.y=element_text(color="black", size=40),
-        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
-        axis.text.y =element_text(color="black", size=30),
-        legend.text = element_text(color="black", size=30),
-        legend.title = element_blank()) +
-  scale_y_continuous(expand = c(0,0)) +
-  labs(x='Year', y='Total strandings')
-StrandingbyYear
-
-# strandings by year (color by alive/dead)<- Do not use see notes
-st.vs.year =
-  st %>%
-  group_by(Vital.Status,Year) %>%
-  tally()
-
-DorAallStrandings<-ggplot(st.vs.year, aes(x = Year, y = n, fill=Vital.Status)) + 
-  geom_col() +
-  scale_fill_brewer(palette="Set2") +
-  theme_classic() +
-  theme(axis.title.x=element_text(color="black", size=40), 
-        axis.title.y=element_text(color="black", size=40),
-        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
-        axis.text.y =element_text(color="black", size=30),
-        legend.text = element_text(color="black", size=50),
-        legend.title = element_blank()) +
-  scale_y_continuous(expand = c(0,0)) +
-  labs(x='Year', y='Total Strandings')
-DorAallStrandings
-
-# entangled strandings by year (color by alive/dead) ***NEW***
-st.vs.year.ent =
-  st[st$Fishery.Interaction=="Y",] %>%
-  group_by(Vital.Status,Year) %>%
-  tally()
-
-
-ggplot(st.vs.year.ent, aes(x = Year, y = n, fill=Vital.Status)) + 
-  geom_col() +
-  scale_fill_brewer(palette="Set3") +
-  xlab("Year") +
-  ylab("Strandings - Fishery Int.") +
-  ylim(0,18) +
-  theme_classic() +
-  theme(legend.title=element_blank(), axis.text.x=element_text(angle=90, vjust=0.5))
 
 ##### Ship Strike stranding graphs####
 # ship strike strandings by year (color by alive/dead) ***NEW***<-don't use
@@ -422,7 +365,7 @@ st.vs.year.ship =
 
 ShipDorA<-ggplot(st.vs.year.ship, aes(x = Year, y = n, fill=Vital.Status)) + 
   geom_col() +
-  scale_fill_brewer(palette="BuPu",direction = -1) +
+  scale_fill_brewer(palette="BuPu") +
   theme_classic() +
   theme(legend.position="top")+ 
   theme(axis.title.x=element_text(color="black", size=40), 
@@ -514,6 +457,65 @@ strandings<-(Shipbyspp/(ShipDorA+Monthwhalest)/countyst)+
   theme(plot.tag = element_text(size =50,face='bold'))   #edit the lettered text
 strandings
 ggsave(filename = "Output/shipstrikes.pdf", useDingbats =FALSE,dpi=600,device = "pdf", width = 30, height = 40)
+
+
+#####All stranding graphs#####
+# strandings by year (color by species)
+st.sp.year =
+  st2010 %>%
+  group_by(Common.Name,Year) %>%
+  tally()
+
+StrandingbyYear<-ggplot(st.sp.year, aes(x = Year, y = n, fill=Common.Name)) + 
+  geom_col() +
+  colScale +
+  theme_classic() +
+  theme(legend.position="none")+ 
+  theme(axis.title.x=element_text(color="black", size=40), 
+        axis.title.y=element_text(color="black", size=40),
+        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
+        axis.text.y =element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=30),
+        legend.title = element_blank()) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x='Year', y='Total strandings')
+StrandingbyYear
+
+# strandings by year (color by alive/dead)<- Do not use see notes
+st.vs.year =
+  st %>%
+  group_by(Vital.Status,Year) %>%
+  tally()
+
+DorAallStrandings<-ggplot(st.vs.year, aes(x = Year, y = n, fill=Vital.Status)) + 
+  geom_col() +
+  scale_fill_brewer(palette="Set2") +
+  theme_classic() +
+  theme(axis.title.x=element_text(color="black", size=40), 
+        axis.title.y=element_text(color="black", size=40),
+        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
+        axis.text.y =element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=50),
+        legend.title = element_blank()) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x='Year', y='Total Strandings')
+DorAallStrandings
+
+# entangled strandings by year (color by alive/dead) ***NEW***
+st.vs.year.ent =
+  st[st$Fishery.Interaction=="Y",] %>%
+  group_by(Vital.Status,Year) %>%
+  tally()
+
+
+ggplot(st.vs.year.ent, aes(x = Year, y = n, fill=Vital.Status)) + 
+  geom_col() +
+  scale_fill_brewer(palette="Set3") +
+  xlab("Year") +
+  ylab("Strandings - Fishery Int.") +
+  ylim(0,18) +
+  theme_classic() +
+  theme(legend.title=element_blank(), axis.text.x=element_text(angle=90, vjust=0.5))
 
 ####Other spp specific graphs####
 # gray whale strandings by year (color by alive/dead)
