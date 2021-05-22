@@ -7,7 +7,7 @@ library(tidyverse)
 library(lubridate)
 library(RColorBrewer)
 library(patchwork)
-
+library(ggpubr)
 #load data
 en<-read.csv("data/Entangled_WA-OR-CA_1982-2019_corrected.csv")
 
@@ -96,15 +96,12 @@ nrow(en2010[en2010$Common.Name=="Orca",]) # 2 orcas in post-2010 dataset
 
 
 ###### Entanglement graphs#####
-
-
 # bar graph w/ entanglements by year (color by species)
 en.sp.year <-
-  en %>%
+  en2010 %>%
   group_by(Common.Name,Year) %>%
   tally()
 df$days<-as.Date(format(df$date,"%d-%m-2015"),format="%d-%m-%y")
-
 
 entbyspp<-ggplot(en.sp.year, aes(x = Year, y = n, fill=Common.Name)) + 
   geom_col() +
@@ -113,29 +110,13 @@ entbyspp<-ggplot(en.sp.year, aes(x = Year, y = n, fill=Common.Name)) +
   theme(legend.position="none")+ 
   theme(axis.title.x=element_text(color="black", size=40), 
         axis.title.y=element_text(color="black", size=40),
-        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
+        axis.text.x =element_text(color="black", size=30),
         axis.text.y =element_text(color="black", size=30),
         legend.text = element_text(color="black", size=30),
         legend.title = element_blank()) +
   scale_y_continuous(expand = c(0,0)) +
   labs(x='Year', y='Total entanglements')
 entbyspp
-
-
-# bar graph w/ entanglements by year (color by vital status)
-en.vs.year =
-  en %>%
-  group_by(Vital.Status,Year) %>%
-  tally()
-
-
-ggplot(en.vs.year, aes(x = Year, y = n, fill=Vital.Status)) + 
-  geom_col() +
-  scale_fill_brewer(palette="Set3") +
-  xlab("Year") +
-  ylab("Total entanglements") +
-  theme_classic() +
-  theme(legend.title=element_blank(), axis.text.x=element_text(angle=90, vjust=0.5))
 
 # bar graph w/ entanglements by month (color by species)
 en.sp.mo =
@@ -171,7 +152,7 @@ en.sp.county =
 en.sp.county$County <- factor(en.sp.county$County, levels=c("CAN","Clallam", "Snohomish", "San Juan", "Jefferson", "Grays Harbor",
                                                              "Pacific","Clatsop","Tillamook","Lincoln",
                                                             "Douglas","Coos", "Curry", "Del Norte","Humboldt",
-                                                            "Mendicino","Marin", "Sonoma",
+                                                            "Mendocino","Marin", "Sonoma",
                                                             "San Francisco", "San Mateo", 
                                                             "Santa Cruz", "Monterey","San Luis Obispo","Santa Barbara", 
                                                             "Ventura", "Los Angeles", "Orange", "San Diego","MEX"))
@@ -188,6 +169,11 @@ entbycounty<-ggplot(en.sp.county, aes(x = County, y = n, fill=Common.Name)) +
         legend.text = element_text(color="black", size=50),
         legend.title = element_blank()) +
   scale_y_continuous(expand = c(0,0)) +
+  geom_bracket(
+    xmin = c("Clallam", "Clatsop","Del Norte"), xmax = c("Pacific", "Curry","San Diego"),
+    y.position = c(30,40,60),
+    label = c("WA", "OR","CA"),
+    tip.length = 0.01) +
   labs(x='Country/County', y='Total entanglements (2010-present)')
 entbycounty
 
@@ -197,6 +183,11 @@ en.sp.gear =
   group_by(Common.Name,Entanglement.Fishery.Type) %>%
   tally()
 
+en.sp.gear$Entanglement.Fishery.Type<-factor(en.sp.gear$Entanglement.Fishery.Type, levels=c('ComDungCrab', 'RecDungCrab','TribalDungCrab',
+                                                                           'ComLobster','ComSpotPrawn','RecSpotPrawn','Sablefish',
+                                                                           'DriftGillnet','Gillnet','TribalGillnet', 'Net',
+                                                                           'Other','Unknown'))
+                                                                           
 #need to fix x axis labels
 fishtype<-ggplot(en.sp.gear, aes(x=Entanglement.Fishery.Type, y=n, fill=Common.Name)) + 
   geom_col() +
@@ -205,13 +196,13 @@ fishtype<-ggplot(en.sp.gear, aes(x=Entanglement.Fishery.Type, y=n, fill=Common.N
   theme(legend.position="none")+ 
   theme(axis.title.x=element_text(color="black", size=40), 
         axis.title.y=element_text(color="black", size=40),
-        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
+        axis.text.x =element_text(color="black", size=30),
         axis.text.y =element_text(color="black", size=30),
         legend.text = element_text(color="black", size=30),
         legend.title = element_blank()) +
-  scale_x_discrete(labels= c('ComDungCrab'='Com. Dung. Crab', 'ComLobster'='Com. Lobster',
-                             'ComSpotPrawn'='Com. Spot Prawn','DriftGillnet'='Drift Gillnet','Gillnet'='Gillnet', 'Net'='Net','Other'='Other',
-                             'RecDungCrab'='Rec. Dung. Crab','RecSpotPrawn'='Rec. Spot Prawn','TribalDungCrab'='Tribal Dung. Crab','TribalGillnet'='Tribal Gillnet','Unknown'='Unknown'))+
+  scale_x_discrete(labels= c('ComDungCrab'='CDC', 'ComLobster'='CL',
+                             'ComSpotPrawn'='CSP','DriftGillnet'='DG','Gillnet'='G', 'Net'='N','Other'='O',
+                             'RecDungCrab'='RDC','RecSpotPrawn'='RSP','Sablefish'='SF','TribalDungCrab'='TDC','TribalGillnet'='TG','Unknown'='Unk'))+
   scale_y_continuous(expand = c(0,0)) +
   labs(x='Type of fishery gear', y='Total entanglements (2010-present)')
 fishtype
