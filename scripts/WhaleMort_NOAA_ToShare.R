@@ -356,7 +356,7 @@ st.vs.year.ship =
 
 ShipDorA<-ggplot(st.vs.year.ship, aes(x = Year, y = n, fill=Vital.Status)) + 
   geom_col() +
-  scale_fill_brewer(palette="BuPu") +
+  scale_fill_manual(values=c('#7fcdbb',"#810f7c")) +
   theme_classic() +
   theme(legend.position="top")+ 
   theme(axis.title.x=element_text(color="black", size=40), 
