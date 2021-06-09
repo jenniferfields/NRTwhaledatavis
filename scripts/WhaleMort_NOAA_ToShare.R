@@ -169,11 +169,6 @@ entbycounty<-ggplot(en.sp.county, aes(x = County, y = n, fill=Common.Name)) +
         legend.text = element_text(color="black", size=50),
         legend.title = element_blank()) +
   scale_y_continuous(expand = c(0,0)) +
-  geom_bracket(
-    xmin = c("Clallam", "Clatsop","Del Norte"), xmax = c("Pacific", "Curry","San Diego"),
-    y.position = c(30,40,60),
-    label = c("WA", "OR","CA"),
-    tip.length = 0.01) +
   labs(x='Country/County', y='Total entanglements (2010-present)')
 entbycounty
 
@@ -190,13 +185,13 @@ en.sp.gear$Entanglement.Fishery.Type<-factor(en.sp.gear$Entanglement.Fishery.Typ
                                                                            
 #need to fix x axis labels
 fishtype<-ggplot(en.sp.gear, aes(x=Entanglement.Fishery.Type, y=n, fill=Common.Name)) + 
-  geom_col() +
+  geom_col()+
   colScale +
   theme_classic()+
   theme(legend.position="none")+ 
   theme(axis.title.x=element_text(color="black", size=40), 
         axis.title.y=element_text(color="black", size=40),
-        axis.text.x =element_text(color="black", size=30),
+        axis.text.x =element_text(color="black", size=25),
         axis.text.y =element_text(color="black", size=30),
         legend.text = element_text(color="black", size=30),
         legend.title = element_blank()) +
