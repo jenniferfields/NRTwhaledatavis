@@ -140,7 +140,7 @@ Monthwhaleent<-ggplot(en.sp.mo, aes(x = Month, y = n, fill=Common.Name)) +
                             '03'='Mar','04'='Apr','05'='May','06'='Jun','07'='Jul','08'='Aug',
                             '09'='Sept','10'='Oct','11'='Nov','12'='Dec'))+
   scale_y_continuous(expand = c(0,0)) +
-  labs(x='Time of year', y='Total entanglements (2010-present)')
+  labs(x='Time of year', y='Total entanglements')
 Monthwhaleent
 
 # bar graph w/ entanglements by county (color by species)
@@ -169,7 +169,7 @@ entbycounty<-ggplot(en.sp.county, aes(x = County, y = n, fill=Common.Name)) +
         legend.text = element_text(color="black", size=50),
         legend.title = element_blank()) +
   scale_y_continuous(expand = c(0,0)) +
-  labs(x='Country/County', y='Total entanglements (2010-present)')
+  labs(x='Country/County', y='Total entanglements')
 entbycounty
 
 # bar graph w/ entanglements by gear type (color by species)
@@ -199,7 +199,7 @@ fishtype<-ggplot(en.sp.gear, aes(x=Entanglement.Fishery.Type, y=n, fill=Common.N
                              'ComSpotPrawn'='CSP','DriftGillnet'='DG','Gillnet'='G', 'Net'='N','Other'='O',
                              'RecDungCrab'='RDC','RecSpotPrawn'='RSP','Sablefish'='SF','TribalDungCrab'='TDC','TribalGillnet'='TG','Unknown'='Unk'))+
   scale_y_continuous(expand = c(0,0)) +
-  labs(x='Type of fishery gear', y='Total entanglements (2010-present)')
+  labs(x='Type of fishery gear', y='Total entanglements')
 fishtype
 
 entanglement<-(entbyspp/(fishtype+Monthwhaleent)/entbycounty)+
@@ -342,7 +342,7 @@ int.labs = c("Ship strike","Shot","Fishery","Other")
 names(int.labs) = c("Boat.Collision","Shot","Fishery.Interaction","Other.Human.Interaction")
 
 ##### Ship Strike stranding graphs####
-# ship strike strandings by year (color by alive/dead) ***NEW***<-don't use
+# ship strike strandings by year (color by alive/dead) 
 st.vs.year.ship =
   st2010[st2010$Boat.Collision=="Y",] %>%
   group_by(Vital.Status,Year) %>%
@@ -351,7 +351,7 @@ st.vs.year.ship =
 
 ShipDorA<-ggplot(st.vs.year.ship, aes(x = Year, y = n, fill=Vital.Status)) + 
   geom_col() +
-  scale_fill_manual(values=c('#7fcdbb',"#810f7c")) +
+  scale_fill_manual(values=c("#bdbdbd",'#636363')) +
   theme_classic() +
   theme(legend.position="top")+ 
   theme(axis.title.x=element_text(color="black", size=40), 
@@ -362,7 +362,7 @@ ShipDorA<-ggplot(st.vs.year.ship, aes(x = Year, y = n, fill=Vital.Status)) +
         legend.title = element_blank()) +
   guides(fill= guide_legend(override.aes = list(size = 15)))+
   scale_y_continuous(expand = c(0,0)) +
-  labs(x='Year', y='Ship strike strandings (2010 to present)')
+  labs(x='Year', y='Ship strike strandings')
 ShipDorA
 
 shipyearspp =
@@ -407,7 +407,7 @@ countyst<-ggplot(st.sp.county, aes(x = County, y = n, fill=Common.Name)) +
         legend.text = element_text(color="black", size=50),
         legend.title = element_blank()) +
   scale_y_continuous(expand = c(0,0)) +
-  labs(x='County', y='Ship strike strandings (2010-present)')
+  labs(x='County', y='Ship strike strandings')
 countyst
 
 # bar graph w/ strandings by month (color by species)
