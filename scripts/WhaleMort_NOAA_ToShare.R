@@ -102,7 +102,7 @@ en.sp.year <-
   group_by(Common.Name,Year) %>%
   tally()
 df$days<-as.Date(format(df$date,"%d-%m-2015"),format="%d-%m-%y")
-en.sp.year$Common.Name<-factor(en.sp.year$Common.Name, levels=c('Unknown','Minke','Orca','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
+en.sp.year$Common.Name<-factor(en.sp.year$Common.Name, levels=c('Unknown','Minke','Orca','Sperm','Fin','Gray','Blue','Humpback'))                                                                         
 
 entbyspp<-ggplot(en.sp.year, aes(x = Year, y = n, fill=Common.Name)) + 
   geom_col() +
@@ -125,7 +125,7 @@ en.sp.mo =
   group_by(Common.Name,Month) %>%
   tally()
 
-en.sp.mo$Common.Name<-factor(en.sp.mo$Common.Name, levels=c('Unknown','Minke','Orca','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
+en.sp.mo$Common.Name<-factor(en.sp.mo$Common.Name, levels=c('Unknown','Minke','Orca','Sperm','Fin','Gray','Blue','Humpback'))                                                                         
 
 #fix
 Monthwhaleent<-ggplot(en.sp.mo, aes(x = Month, y = n, fill=Common.Name)) + 
@@ -134,7 +134,7 @@ Monthwhaleent<-ggplot(en.sp.mo, aes(x = Month, y = n, fill=Common.Name)) +
   theme_classic() +
   #theme(legend.position="none")+ 
   theme(axis.title.x=element_text(color="black",size=40), 
-        axis.title.y=element_blank(),
+        axis.title.y=element_text(color="black", size=40),
         axis.text.x =element_text(color="black", size=30),
         axis.text.y =element_text(color="black", size=30),
         legend.text = element_text(color="black", size=50),
@@ -160,7 +160,7 @@ en.sp.county$County <- factor(en.sp.county$County, levels=c("CAN","Clallam", "Sn
                                                             "San Francisco", "San Mateo", 
                                                             "Santa Cruz", "Monterey","San Luis Obispo","Santa Barbara", 
                                                             "Ventura", "Los Angeles", "Orange", "San Diego","MEX"))
-en.sp.county$Common.Name<-factor(en.sp.county$Common.Name, levels=c('Unknown','Minke','Orca','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
+en.sp.county$Common.Name<-factor(en.sp.county$Common.Name, levels=c('Unknown','Minke','Orca','Sperm','Fin','Gray','Blue','Humpback'))                                                                         
 
 entbycountyall<-ggplot(en.sp.county, aes(x = County, y = n, fill=Common.Name)) + 
   geom_col() +
@@ -216,7 +216,7 @@ entbycountycomb<-ggplot(en.sp.countycombined, aes(x = state, y = n, fill=Common.
   theme_classic()+
   theme(legend.position="none")+ 
   theme(axis.title.x=element_text(color="black", size=40), 
-        axis.title.y=element_text(color="black", size=40),
+        axis.title.y=element_blank(),
         axis.text.x =element_text(color="black", size=30),
         axis.text.y =element_text(color="black", size=30),
         legend.text = element_text(color="black", size=50),
@@ -236,7 +236,7 @@ en.sp.gear$Entanglement.Fishery.Type<-factor(en.sp.gear$Entanglement.Fishery.Typ
                                                                            'DriftGillnet','Gillnet','TribalGillnet', 'Net',
                                                                            'Other','Unknown'))
 
-en.sp.gear$Common.Name<-factor(en.sp.gear$Common.Name, levels=c('Unknown','Minke','Orca','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
+en.sp.gear$Common.Name<-factor(en.sp.gear$Common.Name, levels=c('Unknown','Minke','Orca','Sperm','Fin','Gray','Blue','Humpback'))                                                                         
 #need to fix x axis labels
 fishtypeall<-ggplot(en.sp.gear, aes(x=Entanglement.Fishery.Type, y=n, fill=Common.Name)) + 
   geom_col()+
@@ -258,7 +258,7 @@ fishtypeall
 
 #more combined fishery types
 en.sp.gearcombined<-en.sp.gear %>%
-  dplyr::mutate(Combinedtype=case_when(Entanglement.Fishery.Type =='ComDungCrab' ~ 'Commerical Dungeness crab',
+  dplyr::mutate(Combinedtype=case_when(Entanglement.Fishery.Type =='ComDungCrab' ~ 'Comm. Dungeness crab',
                           Entanglement.Fishery.Type =='ComLobster' ~ 'All other fisheries',
                           Entanglement.Fishery.Type =='ComSpotPrawn' ~ 'All other fisheries',
                           Entanglement.Fishery.Type =='RecDungCrab' ~ 'All other fisheries',
@@ -271,7 +271,7 @@ en.sp.gearcombined<-en.sp.gear %>%
                           Entanglement.Fishery.Type =='TribalDungCrab' ~ 'All other fisheries',
                           Entanglement.Fishery.Type =='TribalGillnet' ~ 'All other fisheries',
                           Entanglement.Fishery.Type =='Unknown' ~ 'Unknown'))
-en.sp.gearcombined$Combinedtype<-factor(en.sp.gearcombined$Combinedtype, levels=c('Commerical Dungeness crab', 'All other fisheries', 'Unknown'))                                                                         
+en.sp.gearcombined$Combinedtype<-factor(en.sp.gearcombined$Combinedtype, levels=c('Comm. Dungeness crab', 'All other fisheries', 'Unknown'))                                                                         
 
 fishtypecomb<-ggplot(en.sp.gearcombined, aes(x=Combinedtype, y=n, fill=Common.Name)) + 
   geom_col()+
@@ -285,15 +285,20 @@ fishtypecomb<-ggplot(en.sp.gearcombined, aes(x=Combinedtype, y=n, fill=Common.Na
         legend.text = element_text(color="black", size=30),
         legend.title = element_blank()) +
   scale_y_continuous(expand = c(0,0)) +
-  labs(x='Type of fishery gear', y='Total entanglements')
+  labs(x='Type of entanglement gear', y='Total entanglements')
 fishtypecomb
 
-entanglement<-(entbyspp/(fishtype+Monthwhaleent)/entbycounty)+
+entanglement<-(entbyspp/(fishtypeall+Monthwhaleent)/entbycountyall)+
   plot_annotation(tag_levels = 'A') &         #label each individual plot with letters A-G
   theme(plot.tag = element_text(size =50,face='bold'))   #edit the lettered text
 entanglement
 ggsave(filename = "Output/entanglement.pdf", useDingbats =FALSE,dpi=600,device = "pdf", width = 30, height = 40)
 
+entanglementedits<-(entbyspp/(fishtypecomb+entbycountycomb)/Monthwhaleent)+
+  plot_annotation(tag_levels = 'A') &         #label each individual plot with letters A-G
+  theme(plot.tag = element_text(size =50,face='bold'))   #edit the lettered text
+entanglementedits
+ggsave(filename = "Output/entanglementedits.pdf", useDingbats =FALSE,dpi=600,device = "pdf", width = 30, height = 40)
 ###### STRANDINGS ######
 st_WAOR<-read.csv("data/Strands_WA-OR_1974-2019.csv")
 st_CA_post2006<-read.csv("data/Strands_CA_2006-2019.csv")
@@ -433,8 +438,6 @@ st.vs.year.ship =
   st2010[st2010$Boat.Collision=="Y",] %>%
   group_by(Vital.Status,Year) %>%
   tally()
-st.vs.year.ship$Common.Name<-factor(st.vs.year.ship$Common.Name, levels=c('Unknown','Minke','Sei','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
-
 
 ShipDorA<-ggplot(st.vs.year.ship, aes(x = Year, y = n, fill=Vital.Status)) + 
   geom_col() +
@@ -456,7 +459,7 @@ shipyearspp =
   st2010[st2010$Boat.Collision=="Y",] %>%
   group_by(Common.Name,Year) %>%
   tally()
-shipyearspp$Common.Name<-factor(shipyearspp$Common.Name, levels=c('Unknown','Minke','Sei','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
+shipyearspp$Common.Name<-factor(shipyearspp$Common.Name, levels=c('Unknown','Minke','Sei','Sperm','Fin','Gray','Blue','Humpback'))                                                                         
 
 Shipbyspp<-ggplot(shipyearspp, aes(x = Year, y = n, fill=Common.Name)) + 
   geom_col() +
@@ -482,7 +485,30 @@ st.sp.county =
 st.sp.county$County <- factor(st.sp.county$County, levels=c("Clallam", "Jefferson", "King", "Pierce","Grays Harbor", "Pacific","Clatsop", "Curry", "Marin",
 "Contra Costa","Alameda", "San Francisco", "San Mateo", 
 "Santa Cruz", "Monterey","Santa Barbara", "Ventura", "Los Angeles", "Orange", "San Diego"))
-st.sp.county$Common.Name<-factor(st.sp.county$Common.Name, levels=c('Unknown','Minke','Sei','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
+st.sp.county$Common.Name<-factor(st.sp.county$Common.Name, levels=c('Unknown','Minke','Sei','Sperm','Fin','Gray','Blue','Humpback'))                                                                         
+st.sp.countycomb<-st.sp.county%>%
+  dplyr::mutate(state=case_when(County =="Clallam" ~ 'Washington',
+                                County =="King" ~ 'Washington',
+                                County =="Pierce" ~ 'Washington',
+                                County =="Jefferson" ~ 'Washington',
+                                County =="Grays Harbor" ~ 'Washington',
+                                County =="Pacific" ~ 'Washington',
+                                County =="Clatsop" ~ 'Oregon',
+                                County =="Curry"~ 'Oregon',
+                                County =="Alameda" ~ 'California',
+                                County =="Marin" ~ 'California',
+                                County =="Contra Costa" ~ 'California',
+                                County =="San Francisco" ~ 'California',
+                                County =="San Mateo" ~ 'California',
+                                County =="Santa Cruz" ~ 'California',
+                                County =="Monterey" ~ 'California',
+                                County =="Santa Barbara" ~ 'California',
+                                County =="Ventura" ~ 'California',
+                                County =="Los Angeles" ~ 'California',
+                                County =="Orange" ~ 'California',
+                                County =="San Diego" ~ 'California'))
+
+st.sp.countycomb$state<-factor(st.sp.countycomb$state, levels=c( 'Washington','Oregon','California')) 
 
 countyst<-ggplot(st.sp.county, aes(x = County, y = n, fill=Common.Name)) + 
   geom_col() +
@@ -499,6 +525,20 @@ countyst<-ggplot(st.sp.county, aes(x = County, y = n, fill=Common.Name)) +
   labs(x='County', y='Ship strike strandings')
 countyst
 
+countystcomb<-ggplot(st.sp.countycomb, aes(x = state, y = n, fill=Common.Name)) + 
+  geom_col() +
+  colScale +
+  theme_classic() +
+  theme(legend.position="none")+ 
+  theme(axis.title.x=element_text(color="black", size=40),
+        axis.title.y=element_blank(),
+        axis.text.x =element_text(color="black", size=30),
+        axis.text.y =element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=50),
+        legend.title = element_blank()) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x='State', y='Ship strike strandings')
+countystcomb
 # bar graph w/ strandings by month (color by species)
 st2010$Month=format(as.Date(st2010$Observation.Date,format="%Y-%m-%d"),"%m")
 
@@ -506,7 +546,7 @@ st.sp.mo =
   st2010[st2010$Boat.Collision=="Y",] %>%
   group_by(Common.Name,Month) %>%
   tally()
-st.sp.mo$Common.Name<-factor(st.sp.mo$Common.Name, levels=c('Unknown','Minke','Sei','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
+st.sp.mo$Common.Name<-factor(st.sp.mo$Common.Name, levels=c('Unknown','Minke','Sei','Sperm','Fin','Gray','Blue','Humpback'))                                                                         
 
 #fix
 Monthwhalest<-ggplot(st.sp.mo, aes(x = Month, y = n, fill=Common.Name)) + 
@@ -515,7 +555,7 @@ Monthwhalest<-ggplot(st.sp.mo, aes(x = Month, y = n, fill=Common.Name)) +
   theme_classic() +
   #theme(legend.position="none")+ 
   theme(axis.title.x=element_text(color="black",size=40), 
-        axis.title.y=element_blank(),
+        axis.title.y=element_text(color="black",size=40),
         axis.text.x =element_text(color="black", size=30),
         axis.text.y =element_text(color="black", size=30),
         legend.text = element_text(color="black", size=50),
@@ -535,6 +575,11 @@ strandings<-(Shipbyspp/(ShipDorA+Monthwhalest)/countyst)+
 strandings
 ggsave(filename = "Output/shipstrikes.pdf", useDingbats =FALSE,dpi=600,device = "pdf", width = 30, height = 40)
 
+strandingscomb<-(Shipbyspp/(ShipDorA+countystcomb)/Monthwhalest)+
+  plot_annotation(tag_levels = 'A') &         #label each individual plot with letters A-G
+  theme(plot.tag = element_text(size =50,face='bold'))   #edit the lettered text
+strandingscomb
+ggsave(filename = "Output/shipstrikesedits.pdf", useDingbats =FALSE,dpi=600,device = "pdf", width = 30, height = 40)
 
 #####All stranding graphs#####
 # strandings by year (color by species)
