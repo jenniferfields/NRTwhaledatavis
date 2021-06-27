@@ -102,6 +102,7 @@ en.sp.year <-
   group_by(Common.Name,Year) %>%
   tally()
 df$days<-as.Date(format(df$date,"%d-%m-2015"),format="%d-%m-%y")
+en.sp.year$Common.Name<-factor(en.sp.year$Common.Name, levels=c('Unknown','Minke','Orca','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
 
 entbyspp<-ggplot(en.sp.year, aes(x = Year, y = n, fill=Common.Name)) + 
   geom_col() +
@@ -123,6 +124,9 @@ en.sp.mo =
   en2010 %>%
   group_by(Common.Name,Month) %>%
   tally()
+
+en.sp.mo$Common.Name<-factor(en.sp.mo$Common.Name, levels=c('Unknown','Minke','Orca','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
+
 #fix
 Monthwhaleent<-ggplot(en.sp.mo, aes(x = Month, y = n, fill=Common.Name)) + 
   geom_col() +
@@ -156,8 +160,9 @@ en.sp.county$County <- factor(en.sp.county$County, levels=c("CAN","Clallam", "Sn
                                                             "San Francisco", "San Mateo", 
                                                             "Santa Cruz", "Monterey","San Luis Obispo","Santa Barbara", 
                                                             "Ventura", "Los Angeles", "Orange", "San Diego","MEX"))
+en.sp.county$Common.Name<-factor(en.sp.county$Common.Name, levels=c('Unknown','Minke','Orca','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
 
-entbycounty<-ggplot(en.sp.county, aes(x = County, y = n, fill=Common.Name)) + 
+entbycountyall<-ggplot(en.sp.county, aes(x = County, y = n, fill=Common.Name)) + 
   geom_col() +
   colScale +
   theme_classic()+
@@ -170,7 +175,55 @@ entbycounty<-ggplot(en.sp.county, aes(x = County, y = n, fill=Common.Name)) +
         legend.title = element_blank()) +
   scale_y_continuous(expand = c(0,0)) +
   labs(x='Country/County', y='Total entanglements')
-entbycounty
+entbycountyall
+
+en.sp.countycombined<- en.sp.county%>%
+  dplyr::mutate(state=case_when(County =='CAN' ~ 'Canada',
+                                County =='MEX' ~ 'Mexico',
+                                County =="Clallam" ~ 'Washington',
+                                County =="Snohomish" ~ 'Washington',
+                                County =="San Juan" ~ 'Washington',
+                                County =="Jefferson" ~ 'Washington',
+                                County =="Grays Harbor" ~ 'Washington',
+                                County =="Pacific" ~ 'Washington',
+                                County =="Clatsop" ~ 'Oregon',
+                                County =="Tillamook" ~ 'Oregon',
+                                County =="Lincoln" ~ 'Oregon',
+                                County =="Douglas" ~ 'Oregon',
+                                County =="Coos" ~ 'Oregon',
+                                County =="Curry"~ 'Oregon',
+                                County =="Del Norte" ~ 'California',
+                                County =="Humboldt" ~ 'California',
+                                County =="Mendocino" ~ 'California',
+                                County =="Marin" ~ 'California',
+                                County =="Sonoma" ~ 'California',
+                                County =="San Francisco" ~ 'California',
+                                County =="San Mateo" ~ 'California',
+                                County =="Santa Cruz" ~ 'California',
+                                County =="Monterey" ~ 'California',
+                                County =="San Luis Obispo"~ 'California',
+                                County =="Santa Barbara" ~ 'California',
+                                County =="Ventura" ~ 'California',
+                                County =="Los Angeles" ~ 'California',
+                                County =="Orange" ~ 'California',
+                                County =="San Diego" ~ 'California'))
+
+en.sp.countycombined$state<-factor(en.sp.countycombined$state, levels=c('Canada', 'Washington','Oregon','California','Mexico'))                                                                         
+
+entbycountycomb<-ggplot(en.sp.countycombined, aes(x = state, y = n, fill=Common.Name)) + 
+  geom_col() +
+  colScale +
+  theme_classic()+
+  theme(legend.position="none")+ 
+  theme(axis.title.x=element_text(color="black", size=40), 
+        axis.title.y=element_text(color="black", size=40),
+        axis.text.x =element_text(color="black", size=30),
+        axis.text.y =element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=50),
+        legend.title = element_blank()) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x='Country/State', y='Total entanglements')
+entbycountycomb
 
 # bar graph w/ entanglements by gear type (color by species)
 en.sp.gear = 
@@ -182,9 +235,10 @@ en.sp.gear$Entanglement.Fishery.Type<-factor(en.sp.gear$Entanglement.Fishery.Typ
                                                                            'ComLobster','ComSpotPrawn','RecSpotPrawn','Sablefish',
                                                                            'DriftGillnet','Gillnet','TribalGillnet', 'Net',
                                                                            'Other','Unknown'))
-                                                                           
+
+en.sp.gear$Common.Name<-factor(en.sp.gear$Common.Name, levels=c('Unknown','Minke','Orca','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
 #need to fix x axis labels
-fishtype<-ggplot(en.sp.gear, aes(x=Entanglement.Fishery.Type, y=n, fill=Common.Name)) + 
+fishtypeall<-ggplot(en.sp.gear, aes(x=Entanglement.Fishery.Type, y=n, fill=Common.Name)) + 
   geom_col()+
   colScale +
   theme_classic()+
@@ -200,7 +254,39 @@ fishtype<-ggplot(en.sp.gear, aes(x=Entanglement.Fishery.Type, y=n, fill=Common.N
                              'RecDungCrab'='RDC','RecSpotPrawn'='RSP','Sablefish'='SF','TribalDungCrab'='TDC','TribalGillnet'='TG','Unknown'='Unk'))+
   scale_y_continuous(expand = c(0,0)) +
   labs(x='Type of fishery gear', y='Total entanglements')
-fishtype
+fishtypeall
+
+#more combined fishery types
+en.sp.gearcombined<-en.sp.gear %>%
+  dplyr::mutate(Combinedtype=case_when(Entanglement.Fishery.Type =='ComDungCrab' ~ 'Commerical Dungeness crab',
+                          Entanglement.Fishery.Type =='ComLobster' ~ 'All other fisheries',
+                          Entanglement.Fishery.Type =='ComSpotPrawn' ~ 'All other fisheries',
+                          Entanglement.Fishery.Type =='RecDungCrab' ~ 'All other fisheries',
+                          Entanglement.Fishery.Type =='DriftGillnet' ~ 'All other fisheries',
+                          Entanglement.Fishery.Type =='Gillnet' ~ 'All other fisheries',
+                          Entanglement.Fishery.Type =='Net' ~ 'All other fisheries',
+                          Entanglement.Fishery.Type =='Other' ~ 'All other fisheries',
+                          Entanglement.Fishery.Type =='RecSpotPrawn' ~ 'All other fisheries',
+                          Entanglement.Fishery.Type =='Sablefish' ~ 'All other fisheries',
+                          Entanglement.Fishery.Type =='TribalDungCrab' ~ 'All other fisheries',
+                          Entanglement.Fishery.Type =='TribalGillnet' ~ 'All other fisheries',
+                          Entanglement.Fishery.Type =='Unknown' ~ 'Unknown'))
+en.sp.gearcombined$Combinedtype<-factor(en.sp.gearcombined$Combinedtype, levels=c('Commerical Dungeness crab', 'All other fisheries', 'Unknown'))                                                                         
+
+fishtypecomb<-ggplot(en.sp.gearcombined, aes(x=Combinedtype, y=n, fill=Common.Name)) + 
+  geom_col()+
+  colScale +
+  theme_classic()+
+  theme(legend.position="none")+ 
+  theme(axis.title.x=element_text(color="black", size=40), 
+        axis.title.y=element_text(color="black", size=40),
+        axis.text.x =element_text(color="black", size=25),
+        axis.text.y =element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=30),
+        legend.title = element_blank()) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x='Type of fishery gear', y='Total entanglements')
+fishtypecomb
 
 entanglement<-(entbyspp/(fishtype+Monthwhaleent)/entbycounty)+
   plot_annotation(tag_levels = 'A') &         #label each individual plot with letters A-G
@@ -347,6 +433,7 @@ st.vs.year.ship =
   st2010[st2010$Boat.Collision=="Y",] %>%
   group_by(Vital.Status,Year) %>%
   tally()
+st.vs.year.ship$Common.Name<-factor(st.vs.year.ship$Common.Name, levels=c('Unknown','Minke','Sei','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
 
 
 ShipDorA<-ggplot(st.vs.year.ship, aes(x = Year, y = n, fill=Vital.Status)) + 
@@ -369,6 +456,7 @@ shipyearspp =
   st2010[st2010$Boat.Collision=="Y",] %>%
   group_by(Common.Name,Year) %>%
   tally()
+shipyearspp$Common.Name<-factor(shipyearspp$Common.Name, levels=c('Unknown','Minke','Sei','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
 
 Shipbyspp<-ggplot(shipyearspp, aes(x = Year, y = n, fill=Common.Name)) + 
   geom_col() +
@@ -394,6 +482,7 @@ st.sp.county =
 st.sp.county$County <- factor(st.sp.county$County, levels=c("Clallam", "Jefferson", "King", "Pierce","Grays Harbor", "Pacific","Clatsop", "Curry", "Marin",
 "Contra Costa","Alameda", "San Francisco", "San Mateo", 
 "Santa Cruz", "Monterey","Santa Barbara", "Ventura", "Los Angeles", "Orange", "San Diego"))
+st.sp.county$Common.Name<-factor(st.sp.county$Common.Name, levels=c('Unknown','Minke','Sei','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
 
 countyst<-ggplot(st.sp.county, aes(x = County, y = n, fill=Common.Name)) + 
   geom_col() +
@@ -417,6 +506,8 @@ st.sp.mo =
   st2010[st2010$Boat.Collision=="Y",] %>%
   group_by(Common.Name,Month) %>%
   tally()
+st.sp.mo$Common.Name<-factor(st.sp.mo$Common.Name, levels=c('Unknown','Minke','Sei','Sperm','Blue','Gray','Fin','Humpback'))                                                                         
+
 #fix
 Monthwhalest<-ggplot(st.sp.mo, aes(x = Month, y = n, fill=Common.Name)) + 
   geom_col() +
