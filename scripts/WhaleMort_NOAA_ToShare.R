@@ -113,7 +113,7 @@ entbyspp<-ggplot(en.sp.year, aes(x = Year, y = n, fill=Common.Name)) +
         axis.title.y=element_text(color="black", size=40),
         axis.text.x =element_text(color="black", size=30),
         axis.text.y =element_text(color="black", size=30),
-        legend.text = element_text(color="black", size=30),
+        legend.text = element_text(color="black", size=35),
         legend.title = element_blank()) +
   scale_y_continuous(expand = c(0,0)) +
   labs(x='Year', y='Total entanglements')
@@ -166,7 +166,6 @@ entbycountyall<-ggplot(en.sp.county, aes(x = County, y = n, fill=Common.Name)) +
   geom_col() +
   colScale +
   theme_classic()+
-  theme(legend.position="none")+ 
   theme(axis.title.x=element_text(color="black", size=40), 
         axis.title.y=element_text(color="black", size=40),
         axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
@@ -258,7 +257,7 @@ fishtypeall
 
 #more combined fishery types
 en.sp.gearcombined<-en.sp.gear %>%
-  dplyr::mutate(Combinedtype=case_when(Entanglement.Fishery.Type =='ComDungCrab' ~ 'Comm. Dungeness crab',
+  dplyr::mutate(Combinedtype=case_when(Entanglement.Fishery.Type =='ComDungCrab' ~ 'Comm. Dunge. crab',
                           Entanglement.Fishery.Type =='ComLobster' ~ 'All other fisheries',
                           Entanglement.Fishery.Type =='ComSpotPrawn' ~ 'All other fisheries',
                           Entanglement.Fishery.Type =='RecDungCrab' ~ 'All other fisheries',
@@ -271,7 +270,7 @@ en.sp.gearcombined<-en.sp.gear %>%
                           Entanglement.Fishery.Type =='TribalDungCrab' ~ 'All other fisheries',
                           Entanglement.Fishery.Type =='TribalGillnet' ~ 'All other fisheries',
                           Entanglement.Fishery.Type =='Unknown' ~ 'Unknown'))
-en.sp.gearcombined$Combinedtype<-factor(en.sp.gearcombined$Combinedtype, levels=c('Comm. Dungeness crab', 'All other fisheries', 'Unknown'))                                                                         
+en.sp.gearcombined$Combinedtype<-factor(en.sp.gearcombined$Combinedtype, levels=c('Comm. Dunge. crab', 'All other fisheries', 'Unknown'))                                                                         
 
 fishtypecomb<-ggplot(en.sp.gearcombined, aes(x=Combinedtype, y=n, fill=Common.Name)) + 
   geom_col()+
@@ -280,7 +279,7 @@ fishtypecomb<-ggplot(en.sp.gearcombined, aes(x=Combinedtype, y=n, fill=Common.Na
   theme(legend.position="none")+ 
   theme(axis.title.x=element_text(color="black", size=40), 
         axis.title.y=element_text(color="black", size=40),
-        axis.text.x =element_text(color="black", size=25),
+        axis.text.x =element_text(color="black", size=30),
         axis.text.y =element_text(color="black", size=30),
         legend.text = element_text(color="black", size=30),
         legend.title = element_blank()) +
@@ -289,16 +288,18 @@ fishtypecomb<-ggplot(en.sp.gearcombined, aes(x=Combinedtype, y=n, fill=Common.Na
 fishtypecomb
 
 entanglement<-(entbyspp/(fishtypeall+Monthwhaleent)/entbycountyall)+
-  plot_annotation(tag_levels = 'A') &         #label each individual plot with letters A-G
+  plot_annotation(tag_levels = 'a') &         #label each individual plot with letters A-G
   theme(plot.tag = element_text(size =50,face='bold'))   #edit the lettered text
 entanglement
 ggsave(filename = "Output/entanglement.pdf", useDingbats =FALSE,dpi=600,device = "pdf", width = 30, height = 40)
 
 entanglementedits<-(entbyspp/(fishtypecomb+entbycountycomb)/Monthwhaleent)+
-  plot_annotation(tag_levels = 'A') &         #label each individual plot with letters A-G
+  plot_annotation(tag_levels = 'a') &         #label each individual plot with letters A-G
   theme(plot.tag = element_text(size =50,face='bold'))   #edit the lettered text
 entanglementedits
 ggsave(filename = "Output/entanglementedits.pdf", useDingbats =FALSE,dpi=600,device = "pdf", width = 30, height = 40)
+
+
 ###### STRANDINGS ######
 st_WAOR<-read.csv("data/Strands_WA-OR_1974-2019.csv")
 st_CA_post2006<-read.csv("data/Strands_CA_2006-2019.csv")
@@ -514,7 +515,6 @@ countyst<-ggplot(st.sp.county, aes(x = County, y = n, fill=Common.Name)) +
   geom_col() +
   colScale +
   theme_classic() +
-  theme(legend.position="none")+ 
   theme(axis.title.x=element_text(color="black", size=40), 
         axis.title.y=element_text(color="black", size=40),
         axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
@@ -570,16 +570,25 @@ Monthwhalest
 
 
 strandings<-(Shipbyspp/(ShipDorA+Monthwhalest)/countyst)+
-  plot_annotation(tag_levels = 'A') &         #label each individual plot with letters A-G
+  plot_annotation(tag_levels = 'a') &         #label each individual plot with letters A-G
   theme(plot.tag = element_text(size =50,face='bold'))   #edit the lettered text
 strandings
 ggsave(filename = "Output/shipstrikes.pdf", useDingbats =FALSE,dpi=600,device = "pdf", width = 30, height = 40)
 
 strandingscomb<-(Shipbyspp/(ShipDorA+countystcomb)/Monthwhalest)+
-  plot_annotation(tag_levels = 'A') &         #label each individual plot with letters A-G
+  plot_annotation(tag_levels = 'a') &         #label each individual plot with letters A-G
   theme(plot.tag = element_text(size =50,face='bold'))   #edit the lettered text
 strandingscomb
 ggsave(filename = "Output/shipstrikesedits.pdf", useDingbats =FALSE,dpi=600,device = "pdf", width = 30, height = 40)
+#####Supplemental figures#####
+#Appendix figure with all fisheries and counties
+appenxentanglement<-(fishtypeall/entbycountyall/countyst)+
+  plot_annotation(tag_levels = 'a') &         #label each individual plot with letters A-G
+  theme(plot.tag = element_text(size =50,face='bold'))   #edit the lettered text
+appenxentanglement
+ggsave(filename = "Output/AppendixFigure.pdf", useDingbats =FALSE,dpi=600,device = "pdf", width = 30, height = 40)
+
+ggsave(countyst, filename = "Output/AppendixFigure.pdf", useDingbats =FALSE,dpi=600,device = "pdf", width =15, height = 20)
 
 #####All stranding graphs#####
 # strandings by year (color by species)
@@ -595,8 +604,8 @@ StrandingbyYear<-ggplot(st.sp.year, aes(x = Year, y = n, fill=Common.Name)) +
   theme(legend.position="none")+ 
   theme(axis.title.x=element_text(color="black", size=40), 
         axis.title.y=element_text(color="black", size=40),
-        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
-        axis.text.y =element_text(color="black", size=30),
+        axis.text.x =element_text(color="black", size=35, angle=90, vjust=0.5),
+        axis.text.y =element_text(color="black", size=35),
         legend.text = element_text(color="black", size=30),
         legend.title = element_blank()) +
   scale_y_continuous(expand = c(0,0)) +
@@ -615,8 +624,8 @@ DorAallStrandings<-ggplot(st.vs.year, aes(x = Year, y = n, fill=Vital.Status)) +
   theme_classic() +
   theme(axis.title.x=element_text(color="black", size=40), 
         axis.title.y=element_text(color="black", size=40),
-        axis.text.x =element_text(color="black", size=30, angle=90, vjust=0.5),
-        axis.text.y =element_text(color="black", size=30),
+        axis.text.x =element_text(color="black", size=35, angle=90, vjust=0.5),
+        axis.text.y =element_text(color="black", size=35),
         legend.text = element_text(color="black", size=50),
         legend.title = element_blank()) +
   scale_y_continuous(expand = c(0,0)) +
