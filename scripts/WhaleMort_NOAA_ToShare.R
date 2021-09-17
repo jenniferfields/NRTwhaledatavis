@@ -439,7 +439,7 @@ st.vs.year.ship =
   st2010[st2010$Boat.Collision=="Y",] %>%
   group_by(Vital.Status,Year) %>%
   tally()
-
+write.csv(st.vs.year.ship, file= 'output/deadoralive.csv')
 ShipDorA<-ggplot(st.vs.year.ship, aes(x = Year, y = n, fill=Vital.Status)) + 
   geom_col() +
   scale_fill_manual(values=c("#bdbdbd",'#636363')) +
@@ -461,7 +461,7 @@ shipyearspp =
   group_by(Common.Name,Year) %>%
   tally()
 shipyearspp$Common.Name<-factor(shipyearspp$Common.Name, levels=c('Unknown','Minke','Sei','Sperm','Fin','Gray','Blue','Humpback'))                                                                         
-
+write.csv(shipyearspp, file= 'output/Shipbyyear.csv')
 Shipbyspp<-ggplot(shipyearspp, aes(x = Year, y = n, fill=Common.Name)) + 
   geom_col() +
   colScale +
@@ -510,7 +510,7 @@ st.sp.countycomb<-st.sp.county%>%
                                 County =="San Diego" ~ 'California'))
 
 st.sp.countycomb$state<-factor(st.sp.countycomb$state, levels=c( 'Washington','Oregon','California')) 
-
+write.csv(st.sp.countycomb, file= 'output/Shipbycounty.csv')
 countyst<-ggplot(st.sp.county, aes(x = County, y = n, fill=Common.Name)) + 
   geom_col() +
   colScale +
@@ -547,6 +547,7 @@ st.sp.mo =
   group_by(Common.Name,Month) %>%
   tally()
 st.sp.mo$Common.Name<-factor(st.sp.mo$Common.Name, levels=c('Unknown','Minke','Sei','Sperm','Fin','Gray','Blue','Humpback'))                                                                         
+write.csv(st.sp.mo, file= 'output/Shipbymonth.csv')
 
 #fix
 Monthwhalest<-ggplot(st.sp.mo, aes(x = Month, y = n, fill=Common.Name)) + 
