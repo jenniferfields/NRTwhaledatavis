@@ -590,7 +590,7 @@ ggsave(filename = "Output/AppendixFigure.pdf", useDingbats =FALSE,dpi=600,device
 
 ggsave(countyst, filename = "Output/AppendixFigure.pdf", useDingbats =FALSE,dpi=600,device = "pdf", width =15, height = 20)
 
-#####All stranding graphs#####
+#####Unused graph code#####
 # strandings by year (color by species)
 st.sp.year =
   st2010 %>%
