@@ -439,7 +439,18 @@ st.vs.year.ship =
   st2010[st2010$Boat.Collision=="Y",] %>%
   group_by(Vital.Status,Year) %>%
   tally()
+
+SumA<-st.vs.year.ship%>%
+  dplyr::filter(Vital.Status=='Dead')%>%
+  summarise(alldead=sum(n)) #64
+#81% dead
+SumA<-st.vs.year.ship%>%
+  dplyr::filter(Vital.Status=='Alive')%>%
+  summarise(allalive=sum(n)) #15
+#19% alive
+
 write.csv(st.vs.year.ship, file= 'output/deadoralive.csv')
+
 ShipDorA<-ggplot(st.vs.year.ship, aes(x = Year, y = n, fill=Vital.Status)) + 
   geom_col() +
   scale_fill_manual(values=c("#bdbdbd",'#636363')) +
@@ -510,6 +521,19 @@ st.sp.countycomb<-st.sp.county%>%
                                 County =="San Diego" ~ 'California'))
 
 st.sp.countycomb$state<-factor(st.sp.countycomb$state, levels=c( 'Washington','Oregon','California')) 
+summarystate<-st.sp.countycomb%>%
+  dplyr::group_by(state) %>%
+  dplyr::mutate(total=sum(n))
+#CA 64/80 - 80%
+#WA 14/80 - 17.5%
+#OR 2/80 - 2.5%
+summarywhaleandstate<-st.sp.countycomb%>%
+  dplyr::group_by(Common.Name,state) %>%
+  dplyr::mutate(total=sum(n)) 
+#Gray CA - 22/80 27.5%
+#humpback CA 15/80 18.75%
+#fin CA 14/80 17.5%
+#minke & sei 1.25%, sperm 2.5%
 write.csv(st.sp.countycomb, file= 'output/Shipbycounty.csv')
 countyst<-ggplot(st.sp.county, aes(x = County, y = n, fill=Common.Name)) + 
   geom_col() +
