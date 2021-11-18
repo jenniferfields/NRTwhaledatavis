@@ -4,7 +4,7 @@ This repository includes data source, analysis, and methods for the following ma
 
 **Authors:** Helen Julia Killeen*, Eliza Oldach*, Priya Shukla, Ellie Brauer, Nick Carter, Jennifer Fields, Alexandra Thompsen, Cassidy Cooper, Leah Mellinger, Kaiwen Wang, Carl Hendrickson, Anna Neumann, Pernille Sporon Bøving, Nann Fangue
 
-**Abstract**
+**Abstract:**
 Whales serve important biological and cultural functions in the California Current ecosystem (CCE). Due to recent concerns regarding anthropogenic impacts on whales, the California Ocean Protection Council recently articulated a goal to achieve zero mortality for CCE whales, with a target of creating a statewide plan by 2022. Achieving zero mortality is a laudable but difficult goal to achieve as success depends on understanding the existing sources of mortality, the opportunities for policy change, and coordination of activities across the entire CCE. This review synthesizes the available research on drivers of mortality for nine whale species in the CCE and existing policy that addresses those drivers. Five main threats contribute to whale mortality in the CCE and are currently targeted through relevant policy responses: entanglement, vessel strikes, noise, water quality, and marine debris. Three threats remain largely unaddressed in management, despite their contribution to lethal and sublethal impacts on whales: nutritional stress, disease, and predation. Ultimately, sources of whale mortality are interconnected and their impacts span both geographic and jurisdictional boundaries, necessitating a holistic approach to managing whale mortality in the CCE.
 
 **Journal:**
