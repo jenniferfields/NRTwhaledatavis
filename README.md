@@ -17,7 +17,7 @@ Whales serve important biological and cultural functions in the California Curre
 
 **Data**
 
-This project used a total of four data sets for this project using 2010-2019 data including: Entangled Whale dataset for Washington, Oregon, and California from 1982-2019, Strandings dataset for California 1982-2005, Strandings dataset for California 2006-2019, and Strandings dataset for Washington and Oregon 1974-2019
+This project used a total of four data sets for this project from the NOAA NMFS Marine Mammal Health and Stranding Response Program (MMHSRP) and Entanglements Dataset and NOAA NMFS Marine Mammal Health and Stranding Response Program (MMHSRP)-StrandingsDataset, including: Entangled Whale dataset for Washington, Oregon, and California from 1982-2019, Strandings dataset for California 1982-2005, Strandings dataset for California 2006-2019, and Strandings dataset for Washington and Oregon 1974-2019
 
 These datasets can be obtained through contacting Justin Greenman (justin.greenman@noaa.gov)
 
