@@ -21,7 +21,8 @@ This project used a total of four data sets for this project from the NOAA NMFS 
 
 These datasets can be obtained through contacting Justin Greenman, California Assistant Stranding Coordinator NOAA Marine Mammal Health and Stranding Response Program (justin.greenman@noaa.gov)
 
-**[Coding scripts](https://github.com/jenniferfields/NRTwhaledatavis/tree/master/scripts)** Contains all code for project. Within this folder there are two files:
+**[Coding scripts](https://github.com/jenniferfields/NRTwhaledatavis/tree/master/scripts)** 
+Contains all code for project. Within this folder there are two files:
 
 *[Study area map script](https://github.com/jenniferfields/NRTwhaledatavis/blob/master/scripts/StudyAreaMap)*
 
