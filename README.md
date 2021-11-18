@@ -30,4 +30,5 @@ Contains all code for project. Within this folder there are two files:
 *[Whale mortality data and graphs script](https://github.com/jenniferfields/NRTwhaledatavis/blob/master/scripts/WhaleMort_NOAA_ToShare.R)*
 
 **[Final figures](https://github.com/jenniferfields/NRTwhaledatavis/tree/master/final%20figures)**
+
 Contains Figure 1-3 and supplemental figure of the manuscript
