@@ -27,7 +27,7 @@ Contains all code for project. Within this folder there are two files:
 
 *[Study area map script](https://github.com/jenniferfields/NRTwhaledatavis/blob/master/scripts/StudyAreaMap)*
 
-*[Whale mortality data and graphs script](https://github.com/jenniferfields/NRTwhaledatavis/blob/master/scripts/WhaleMort_NOAA_ToShare.R)*
+*[Whale mortality data and graphs script](https://github.com/jenniferfields/NRTwhaledatavis/blob/master/scripts/WhaleMort_NOAA_ToShare_updated.R)*
 
 **[Final figures](https://github.com/jenniferfields/NRTwhaledatavis/tree/master/final%20figures)**
 
